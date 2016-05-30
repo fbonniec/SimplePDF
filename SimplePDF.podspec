@@ -13,4 +13,5 @@ Pod::Spec.new do |spec|
   spec.source = { git: "https://github.com/nrewik/SimplePDF.git", tag: "v#{spec.version}", submodules: true }
   spec.source_files = "SimplePDF/**/*.{h,swift}"
 
+  spec.resources = "SimplePDF/**/*.{xml}"
 end

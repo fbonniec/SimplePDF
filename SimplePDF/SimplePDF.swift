@@ -335,6 +335,11 @@ public class SimplePDF{
         UIGraphicsBeginPDFContextToData(pdfData, pageBounds, nil)
         UIGraphicsBeginPDFPageWithInfo(pageBounds, nil)
         
+        // Required to create pdf/a
+        let context = UIGraphicsGetCurrentContext()
+        CGContextSetInterpolationQuality(context, CGInterpolationQuality.None)
+        
+        
         var currentYoffset = pageMargin
         var alignment = ContentAlignment.Left
         var font = UIFont.systemFontOfSize( UIFont.systemFontSize() )
@@ -377,6 +382,17 @@ public class SimplePDF{
             }
             
         }
+        
+        let path = NSBundle(forClass: SimplePDF.self).pathForResource("pdf_xmp_metadata", ofType: "xml")!
+        
+        do {
+            // save as a local file
+            let content = try String(contentsOfFile: path)
+            
+            CGPDFContextAddDocumentMetadata(context, content.dataUsingEncoding(NSUTF8StringEncoding));
+            
+        }
+        catch {/* error handling here */}
         
         UIGraphicsEndPDFContext()
         

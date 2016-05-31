@@ -27,6 +27,11 @@ public enum ContentAlignment{
     case Left, Center, Right
 }
 
+let KeyXMPProducer = "KeyXMPProducer"
+let KeyXMPCreator = "KeyXMPCreator"
+let KeyXMPCreatedDate = "KeyXMPCreatedDate"
+let KeyXMPModifyDate = "KeyXMPModifyDate"
+
 public class SimplePDF{
     
     /* States */
@@ -38,6 +43,15 @@ public class SimplePDF{
     
     public init(pageSize: CGSize, pageMargin: CGFloat = 20.0){
         
+        pageBounds = CGRect(origin: CGPoint.zero, size: pageSize)
+        self.pageMargin = pageMargin
+    }
+    
+    var creatorName : String?
+    
+    public init(pdfCreatorName: String?, pageSize: CGSize, pageMargin: CGFloat = 20.0){
+        
+        self.creatorName = pdfCreatorName
         pageBounds = CGRect(origin: CGPoint.zero, size: pageSize)
         self.pageMargin = pageMargin
     }
@@ -330,9 +344,27 @@ public class SimplePDF{
     
     public func generatePDFdata() -> NSData{
         
+        
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        
+        let producer = "iPhone OS Quartz PDFContext"
+        var creator = "SimplePDF 1.0.1"
+        
+        if self.creatorName != nil
+        {
+            creator = self.creatorName!
+        }
+        
+        let currentDate = NSDate()
+        let createdDate = dateFormatter.stringFromDate(currentDate)
+        let modifyDate = dateFormatter.stringFromDate(currentDate)
+        
+        
+        
         let pdfData = NSMutableData()
         
-        UIGraphicsBeginPDFContextToData(pdfData, pageBounds, nil)
+        UIGraphicsBeginPDFContextToData(pdfData, pageBounds, ["Creator" : creator])
         UIGraphicsBeginPDFPageWithInfo(pageBounds, nil)
         
         // Required to create pdf/a
@@ -387,14 +419,21 @@ public class SimplePDF{
         
         do {
             // save as a local file
-            let content = try String(contentsOfFile: path)
+            var content = try String(contentsOfFile: path)
+            
+            content = content.stringByReplacingOccurrencesOfString(KeyXMPProducer, withString: producer)
+            content = content.stringByReplacingOccurrencesOfString(KeyXMPCreator, withString: creator)
+            content = content.stringByReplacingOccurrencesOfString(KeyXMPCreatedDate, withString: createdDate)
+            content = content.stringByReplacingOccurrencesOfString(KeyXMPModifyDate, withString: modifyDate)
             
             CGPDFContextAddDocumentMetadata(context, content.dataUsingEncoding(NSUTF8StringEncoding));
             
         }
         catch {/* error handling here */}
         
+        
         UIGraphicsEndPDFContext()
+        
         
         return pdfData
     }

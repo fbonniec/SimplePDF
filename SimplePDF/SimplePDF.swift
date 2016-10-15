@@ -310,7 +310,7 @@ public class SimplePDF{
         let colorspace = CGColorSpaceCreateDeviceRGB()
         let color = CGColorCreate(colorspace, [0.2, 0.2, 0.2, 1.0])
         
-        CGContextSetStrokeColorWithColor(context, color)
+        CGContextSetStrokeColorWithColor(context, color!)
         CGContextMoveToPoint(context, from.x, from.y)
         CGContextAddLineToPoint(context, to.x, to.y)
         
@@ -369,7 +369,7 @@ public class SimplePDF{
         
         // Required to create pdf/a
         let context = UIGraphicsGetCurrentContext()
-        CGContextSetInterpolationQuality(context, CGInterpolationQuality.None)
+        CGContextSetInterpolationQuality(context!, CGInterpolationQuality.None)
         
         
         var currentYoffset = pageMargin
@@ -426,7 +426,7 @@ public class SimplePDF{
             content = content.stringByReplacingOccurrencesOfString(KeyXMPCreatedDate, withString: createdDate)
             content = content.stringByReplacingOccurrencesOfString(KeyXMPModifyDate, withString: modifyDate)
             
-            CGPDFContextAddDocumentMetadata(context, content.dataUsingEncoding(NSUTF8StringEncoding));
+            CGPDFContextAddDocumentMetadata(context!, content.dataUsingEncoding(NSUTF8StringEncoding));
             
         }
         catch {/* error handling here */}
